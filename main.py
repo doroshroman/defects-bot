@@ -3,6 +3,7 @@
 
 import logging
 import os
+import requests
 
 from telegram import (
     ReplyKeyboardRemove, Update,
@@ -54,6 +55,7 @@ def start(update: Update, context: CallbackContext) -> int:
             'Привіт!'
         )
         msg.reply_text(text=text, reply_markup=keyboard)
+
         sender = _get_sender(update, context)
         context.user_data[SENDER_ID] = sender.id
         context.user_data[SENDER_USERNAME] = sender.username
@@ -65,13 +67,29 @@ def start(update: Update, context: CallbackContext) -> int:
     return SELECTING_ACTION
 
 
-def register(update: Update, context: CallbackContext) -> None:
+def register(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     buttons = [[InlineKeyboardButton(text='🔙 Назад', callback_data=str(END))]]
     keyboard = InlineKeyboardMarkup(buttons)
+
+    payload = {
+        "telegram_id": context.user_data[SENDER_ID],
+        "first_name": context.user_data[SENDER_FIRST_NAME],
+        "last_name": context.user_data[SENDER_LAST_NAME],
+        "username": context.user_data[SENDER_USERNAME]
+    }
+    url = os.environ.get("BASE_URL") + 'users/'
+    res_data = requests.post(url, data=payload).json()
+    message = res_data.get('message')
+
+    reply_text = ('Ви уже зареєстровані!' if message and 'exist' in message
+                    else 'Ваш запит вислано для перевірки, очікуйте на відповідь.')
+    
     query.answer()
-    query.edit_message_text(text='Back', reply_markup=keyboard)
+    query.edit_message_text(text=reply_text, reply_markup=keyboard)
+
     context.user_data[START_OVER] = True
+
     return SHOWING
 
 def cancel(update: Update, context: CallbackContext) -> int:
@@ -92,13 +110,13 @@ def main() -> None:
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
 
-    # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
-    
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
             SHOWING: [CallbackQueryHandler(start, pattern='^' + str(END) + '$')],
-            SELECTING_ACTION: [CallbackQueryHandler(register, pattern='^' + str(REGISTER_ACTION) + '$')]
+            SELECTING_ACTION: [
+                CallbackQueryHandler(register, pattern='^' + str(REGISTER_ACTION) + '$')
+            ]
         },
         fallbacks=[CommandHandler('cancel', cancel)],
     )
@@ -108,9 +126,6 @@ def main() -> None:
     # Start the Bot
     updater.start_polling()
 
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
 
 
