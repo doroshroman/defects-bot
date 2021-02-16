@@ -4,7 +4,7 @@ services:
   bot:
     build: .
     image: defectsbot
-    command: python main.py
+    command: python bot.py
     volumes:
       - .:/usr/src/app/
     ports:
