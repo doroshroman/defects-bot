@@ -21,8 +21,17 @@ class Buttons:
     
     @staticmethod
     def add_defect():
-        buttons = [[InlineKeyboardButton(text='Додати дефект', callback_data=str(con.ADD_DEFECT))]]
+        buttons = [
+            [InlineKeyboardButton(text='➕ Додати дефект', callback_data=str(con.ADD_DEFECT))],
+            [InlineKeyboardButton(text='🔙 В головне меню', callback_data=str(con.END))]
+        ]
+        keyboard = InlineKeyboardMarkup(buttons)
+
+        return keyboard
+    
+    @staticmethod
+    def cancel():
+        buttons = [[InlineKeyboardButton(text='❌ Скасувати', callback_data=str(con.END))]]
         keyboard = InlineKeyboardMarkup(buttons)
         
         return keyboard
-    

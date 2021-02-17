@@ -30,3 +30,10 @@ def start(update: Update, context: CallbackContext) -> int:
     context.user_data[con.START_OVER] = False
 
     return con.SELECTING_ACTION
+
+
+def stop(update: Update, context: CallbackContext) -> None:
+    """End Conversation by command."""
+    update.message.reply_text('Побачимося пізніше.')
+
+    return con.END
