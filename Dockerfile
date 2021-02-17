@@ -12,4 +12,4 @@ RUN pip install -r requirements.txt
 
 COPY . /usr/src/app/
 
-CMD [ "python", "./echobot.py" ]
+CMD [ "python", "./bot.py" ]
