@@ -31,7 +31,7 @@ class Buttons:
     
     @staticmethod
     def cancel():
-        buttons = [[InlineKeyboardButton(text='❌ Скасувати', callback_data=str(con.END))]]
+        buttons = [[InlineKeyboardButton(text='❌ Скасувати', callback_data=str(con.CANCEL))]]
         keyboard = InlineKeyboardMarkup(buttons)
         
         return keyboard
