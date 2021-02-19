@@ -10,6 +10,27 @@ from io import BytesIO
 import os
 
 
+def _remove_defect_cache(context: CallbackContext) -> None:
+    """Removes defect data from context.user_data
+       removes folder with defect photos too
+    """
+    user_data = context.user_data
+
+    defect_state = con.DEFECT
+    defect = user_data.get(defect_state)
+    defect_photo = defect.get(con.DEFECT_PHOTO) if defect else None
+    if defect_photo and os.path.isfile(defect_photo):
+        os.remove(defect_photo)
+
+    # delete empty folder
+    photo_folder = os.environ.get('FILE_CUSTOM_PATH')
+    if os.path.isdir(photo_folder) and not len(os.listdir(photo_folder)):
+        os.rmdir(photo_folder)
+    
+    if defect_state in user_data:
+        del user_data[defect_state]
+    
+
 def defect_title(update: Update, context: CallbackContext) -> int:
     text = "Введіть назву пошкодження"
     keyboard = Buttons.cancel()
@@ -80,15 +101,18 @@ def send_defect(update: Update, context: CallbackContext) -> None:
         "description": defect.get(con.DEFECT_DESCRIPTION),
         "room": defect.get(con.DEFECT_ROOM) 
     }
-
+    photo_file = open(defect.get(con.DEFECT_PHOTO), 'rb')
     files = {
-        "attachment": open(defect.get(con.DEFECT_PHOTO), 'rb')
+        "attachment": photo_file
     }
-
     response = Request.post_defect(payload, files, token)
-    print(response)
+    photo_file.close()
+
+    _remove_defect_cache(context)
+
     text = ("Дефект успішно додано!" if response.ok 
                 else "Сталась помилка на сервері")
+    
     
     query = update.callback_query
     keyboard = Buttons.back_to_menu()
@@ -104,20 +128,9 @@ def end_defect(update: Update, context: CallbackContext) -> int:
     return con.END
 
 def cancel_defect(update: Update, context: CallbackContext) -> int:
-    user_data = context.user_data
+    context.user_data[con.ADD_DEFECT_AGAIN] = True
 
-    # Delete downloaded photo first and then all defect cache
-    defect_state = con.DEFECT
-    defect = user_data.get(defect_state)
-    defect_photo = defect.get(con.DEFECT_PHOTO) if defect else None
-    if defect_photo and os.path.isfile(defect_photo):
-        os.remove(defect_photo)
-
-    if defect_state in user_data:
-        del user_data[defect_state]
-    
-    user_data[con.ADD_DEFECT_AGAIN] = True
-    
+    _remove_defect_cache(context)
     auth(update, context)
     
     return con.CANCEL_DEFECT
