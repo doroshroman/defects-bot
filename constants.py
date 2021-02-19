@@ -11,7 +11,7 @@ from enum import Enum
     SHOWING,
     ADD_DEFECT,
     DESCRIBING_DEFECT,
-    CANCEL
+    CANCEL_DEFECT,
 ) = range(8)
 
 # user context constants
@@ -28,8 +28,9 @@ from enum import Enum
     DEFECT_DESCRIPTION,
     DEFECT_ROOM,
     DEFECT_PHOTO,
-    DEFECT_DONE
-) = range(9, 22)
+    DEFECT_DONE,
+    DEFECT_SEND
+) = range(8, 22)
 
 END = ConversationHandler.END
 

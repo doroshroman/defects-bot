@@ -16,7 +16,8 @@ from handlers.defect import (
     defect_description,
     defect_room,
     defect_photo,
-    add_defect
+    add_defect,
+    send_defect
 )
 
 from telegram.ext import (
@@ -61,15 +62,19 @@ def main() -> None:
             ],
             con.DEFECT_DONE: [
                 MessageHandler(Filters.photo, add_defect)
+            ],
+            con.DEFECT_SEND: [
+                CallbackQueryHandler(send_defect, pattern='^' + str(con.DEFECT_SEND) + '$')
             ]
+            
         },
         fallbacks=[
-            CallbackQueryHandler(cancel_defect, pattern='^' + str(con.CANCEL) + '$'),
+            CallbackQueryHandler(cancel_defect, pattern='^' + str(con.CANCEL_DEFECT) + '$'),
             CallbackQueryHandler(end_defect, pattern='^' + str(con.END) + '$')
         ],
         map_to_parent={
             con.END: con.SELECTING_ACTION,
-            con.CANCEL: con.DESCRIBING_DEFECT
+            con.CANCEL_DEFECT: con.DESCRIBING_DEFECT
         }
     )
 

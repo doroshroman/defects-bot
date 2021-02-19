@@ -4,8 +4,10 @@ import constants as con
 from buttons import Buttons
 from .system import start
 from .auth import auth
+from utils import Request
 
 from io import BytesIO
+import os
 
 
 def defect_title(update: Update, context: CallbackContext) -> int:
@@ -53,8 +55,47 @@ def defect_photo(update: Update, context: CallbackContext) -> int:
 
 def add_defect(update: Update, context: CallbackContext) -> int:
     photo_file = update.message.photo[-1].get_file()
-    photo_stream = BytesIO(photo_file.download_as_bytearray())
+
+    photos_directory = os.environ.get('FILE_CUSTOM_PATH')
+    if not os.path.exists(photos_directory):
+        os.makedirs(photos_directory)
+
+    custom_path = photos_directory + photo_file.file_unique_id + '.jpg'
+    photo_file.download(custom_path=custom_path)
+    context.user_data[con.DEFECT].update({con.DEFECT_PHOTO: custom_path})
+
+    text = "Надіслати"
+    keyboard = Buttons.done()
+    update.message.reply_text(text=text, reply_markup=keyboard)
     
+    return con.DEFECT_SEND
+
+def send_defect(update: Update, context: CallbackContext) -> None:
+    user_data = context.user_data
+    defect = user_data.get(con.DEFECT)
+    token = user_data.get(con.ACCESS_TOKEN)
+    payload = {
+        "created_by": user_data.get(con.SENDER_ID),
+        "title": defect.get(con.DEFECT_TITLE),
+        "description": defect.get(con.DEFECT_DESCRIPTION),
+        "room": defect.get(con.DEFECT_ROOM) 
+    }
+
+    files = {
+        "attachment": open(defect.get(con.DEFECT_PHOTO), 'rb')
+    }
+
+    response = Request.post_defect(payload, files, token)
+    print(response)
+    text = ("Дефект успішно додано!" if response.ok 
+                else "Сталась помилка на сервері")
+    
+    query = update.callback_query
+    keyboard = Buttons.back_to_menu()
+
+    query.answer()
+    query.edit_message_text(text=text, reply_markup=keyboard)
+
 
 def end_defect(update: Update, context: CallbackContext) -> int:
     context.user_data[con.START_OVER] = True
@@ -63,8 +104,21 @@ def end_defect(update: Update, context: CallbackContext) -> int:
     return con.END
 
 def cancel_defect(update: Update, context: CallbackContext) -> int:
-    context.user_data[con.ADD_DEFECT_AGAIN] = True
+    user_data = context.user_data
+
+    # Delete downloaded photo first and then all defect cache
+    defect_state = con.DEFECT
+    defect = user_data.get(defect_state)
+    defect_photo = defect.get(con.DEFECT_PHOTO) if defect else None
+    if defect_photo and os.path.isfile(defect_photo):
+        os.remove(defect_photo)
+
+    if defect_state in user_data:
+        del user_data[defect_state]
+    
+    user_data[con.ADD_DEFECT_AGAIN] = True
+    
     auth(update, context)
     
-    return con.CANCEL
+    return con.CANCEL_DEFECT
     

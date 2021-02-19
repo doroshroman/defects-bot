@@ -30,8 +30,18 @@ class Buttons:
         return keyboard
     
     @staticmethod
+    def done():
+        buttons = [
+            [InlineKeyboardButton(text='✅ Готово', callback_data=str(con.DEFECT_SEND))]
+        ]
+        keyboard = InlineKeyboardMarkup(buttons)
+        
+        return keyboard
+
+
+    @staticmethod
     def cancel():
-        buttons = [[InlineKeyboardButton(text='❌ Скасувати', callback_data=str(con.CANCEL))]]
+        buttons = [[InlineKeyboardButton(text='❌ Скасувати', callback_data=str(con.CANCEL_DEFECT))]]
         keyboard = InlineKeyboardMarkup(buttons)
         
         return keyboard
