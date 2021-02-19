@@ -28,4 +28,9 @@ class Request:
         url = os.environ.get('BASE_URL') + f'users/me/{sender_id}'
         return requests.get(url, auth=BearerAuth(token))
 
+    @staticmethod
+    def post_defect(data, files, token):
+        url = os.environ.get('BASE_URL') + 'defects'
+        return requests.post(url, auth=BearerAuth(token), data=data, files=files)
+
 

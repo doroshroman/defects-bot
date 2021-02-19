@@ -27,7 +27,9 @@ def auth(update: Update, context: CallbackContext) -> int:
     state = con.SHOWING 
 
     if not message and access_token:
-        reply_text = 'Ви успішно ввійшли!'
+        reply_text = ('Виберіть потрібну опцію' if user_data.get(con.ADD_DEFECT_AGAIN)
+                        else 'Ви успішно ввійшли!')
+
         user_data[con.ACCESS_TOKEN] = access_token
 
         role = _get_user_role(context)

@@ -9,7 +9,16 @@ from handlers.system import start, stop
 from handlers.auth import auth
 from handlers.register import register
 from handlers.help import help
-from handlers.defect import add_defect, end_defect
+from handlers.defect import (
+    defect_title,
+    end_defect,
+    cancel_defect,
+    defect_description,
+    defect_room,
+    defect_photo,
+    add_defect,
+    send_defect
+)
 
 from telegram.ext import (
     Updater,
@@ -38,19 +47,34 @@ def main() -> None:
     # collecting data about defect
     defect_conv = ConversationHandler(
         entry_points=[
-            CallbackQueryHandler(add_defect, pattern='^' + str(con.ADD_DEFECT) + '$'),
+            CallbackQueryHandler(defect_title, pattern='^' + str(con.ADD_DEFECT) + '$'),
             CallbackQueryHandler(end_defect, pattern='^' + str(con.END) + '$')
         ],
         states={
             con.DEFECT_DESCRIPTION: [
-                CallbackQueryHandler(add_defect, pattern='^' + str(con.CANCEL) + '$') 
+                MessageHandler(Filters.text & ~Filters.command, defect_description)
+            ],
+            con.DEFECT_ROOM: [
+                MessageHandler(Filters.text & ~Filters.command, defect_room)
+            ],
+            con.DEFECT_PHOTO: [
+                MessageHandler(Filters.text & ~Filters.command, defect_photo)
+            ],
+            con.DEFECT_DONE: [
+                MessageHandler(Filters.photo, add_defect)
+            ],
+            con.DEFECT_SEND: [
+                CallbackQueryHandler(send_defect, pattern='^' + str(con.DEFECT_SEND) + '$')
             ]
+            
         },
         fallbacks=[
+            CallbackQueryHandler(cancel_defect, pattern='^' + str(con.CANCEL_DEFECT) + '$'),
             CallbackQueryHandler(end_defect, pattern='^' + str(con.END) + '$')
         ],
         map_to_parent={
-            con.END: con.SELECTING_ACTION
+            con.END: con.SELECTING_ACTION,
+            con.CANCEL_DEFECT: con.DESCRIBING_DEFECT
         }
     )
 
