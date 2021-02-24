@@ -9,7 +9,7 @@ from handlers.system import start, stop
 from handlers.auth import auth
 from handlers.register import register
 from handlers.help import help
-from handlers.defect import (
+from handlers.defect.new_defect import (
     defect_title,
     end_defect,
     cancel_defect,
@@ -18,6 +18,10 @@ from handlers.defect import (
     defect_photo,
     add_defect,
     send_defect
+)
+from handlers.defect.active_defects import (
+    open_defects,
+    take_defect
 )
 
 from telegram.ext import (
@@ -45,7 +49,7 @@ def main() -> None:
     dispatcher = updater.dispatcher
 
     # collecting data about defect
-    defect_conv = ConversationHandler(
+    new_defect_conv = ConversationHandler(
         entry_points=[
             CallbackQueryHandler(defect_title, pattern='^' + str(con.ADD_DEFECT) + '$'),
             CallbackQueryHandler(end_defect, pattern='^' + str(con.END) + '$')
@@ -77,6 +81,21 @@ def main() -> None:
             con.CANCEL_DEFECT: con.DESCRIBING_DEFECT
         }
     )
+    all_defects_conv = ConversationHandler(
+        entry_points=[
+            CallbackQueryHandler(open_defects, pattern='^' + str(con.ALL_DEFECTS) + '$')
+        ],
+        states={
+            con.CHANGE_DEFECT_STATUS: [
+                CallbackQueryHandler(take_defect, pattern='^' + str(con.Status.in_process.value) + '[0-9]+$' )
+            ]
+        },
+        fallbacks=[],
+        map_to_parent={
+            con.END: con.SELECTING_ACTION
+        }
+    )
+    
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
@@ -87,7 +106,7 @@ def main() -> None:
                 CallbackQueryHandler(auth, pattern='^' + str(con.LOGIN_ACTION) + '$'),
                 CallbackQueryHandler(help, pattern='^' + str(con.HELP_ACTION) + '$')
             ],
-            con.DESCRIBING_DEFECT: [defect_conv]
+            con.DESCRIBING_DEFECT: [new_defect_conv, all_defects_conv]
         },
         fallbacks=[CommandHandler('stop', stop)],
     )

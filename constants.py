@@ -12,7 +12,11 @@ from enum import Enum
     ADD_DEFECT,
     DESCRIBING_DEFECT,
     CANCEL_DEFECT,
-) = range(8)
+    ALL_DEFECTS,
+    TAKE_DEFECT,
+    CLOSE_DEFECT,
+    CHANGE_DEFECT_STATUS
+) = range(12)
 
 # user context constants
 (
@@ -30,14 +34,22 @@ from enum import Enum
     DEFECT_PHOTO,
     DEFECT_DONE,
     DEFECT_SEND
-) = range(8, 22)
+) = range(12, 26)
 
 END = ConversationHandler.END
 
+
 # Roles constants
 class Role(Enum):
-    not_specified = 'Not Specified'
-    technical_worker = 'Technical Worker'
-    sanitary_worker = 'Sanitary Worker'
+    not_specified = "Not Specified"
+    technical_worker = "Technical Worker"
+    sanitary_worker = "Sanitary Worker"
+
+
+# Defect status constants
+class Status(Enum):
+    open = "Open"
+    in_process = "In Process"
+    closed = "Closed"
 
 

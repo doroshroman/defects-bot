@@ -2,6 +2,9 @@ import requests
 import os
 
 
+_base_url = os.environ.get("BASE_URL")
+
+
 class BearerAuth(requests.auth.AuthBase):
     def __init__(self, token):
         self.token = token
@@ -15,22 +18,30 @@ class Request:
 
     @staticmethod
     def register(data):
-        url = os.environ.get("BASE_URL") + 'users/'
+        url = _base_url + 'users/'
         return requests.post(url, data=data)
     
     @staticmethod
     def login(sender_id):
-        url = os.environ.get("BASE_URL") + f"users/login/{sender_id}"
+        url = _base_url + f"users/login/{sender_id}"
         return requests.post(url)
 
     @staticmethod
     def get_user_by_id(sender_id, token):
-        url = os.environ.get('BASE_URL') + f'users/me/{sender_id}'
+        url = _base_url + f'users/me/{sender_id}'
         return requests.get(url, auth=BearerAuth(token))
 
     @staticmethod
     def post_defect(data, files, token):
-        url = os.environ.get('BASE_URL') + 'defects'
+        url = _base_url + 'defects'
         return requests.post(url, auth=BearerAuth(token), data=data, files=files)
-
-
+    
+    @staticmethod
+    def get_defects_by_status(status, token):
+        url = _base_url + f'defects/{status}'
+        return requests.get(url, auth=BearerAuth(token))
+        
+    @staticmethod
+    def get_defect_photo(photo_url, token):
+        url = _base_url + f'defects/image/{photo_url}'
+        return requests.get(url, auth=BearerAuth(token))

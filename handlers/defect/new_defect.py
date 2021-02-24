@@ -2,11 +2,10 @@ from telegram import Update
 from telegram.ext import CallbackContext
 import constants as con
 from buttons import Buttons
-from .system import start
-from .auth import auth
+from ..system import start
+from ..auth import auth
 from utils import Request
 
-from io import BytesIO
 import os
 
 
