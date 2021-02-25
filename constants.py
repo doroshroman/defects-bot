@@ -13,10 +13,10 @@ from enum import Enum
     DESCRIBING_DEFECT,
     CANCEL_DEFECT,
     ALL_DEFECTS,
+    DEFECTS_IN_WORK,
     TAKE_DEFECT,
     CLOSE_DEFECT,
     CHANGE_DEFECT_STATUS,
-    DEFECTS_SELECTING_ACTIONS
 ) = range(13)
 
 # user context constants

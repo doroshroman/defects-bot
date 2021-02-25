@@ -31,7 +31,7 @@ class Buttons:
             [InlineKeyboardButton(text='➕ Додати дефект', callback_data=str(con.ADD_DEFECT))],
             [InlineKeyboardButton(text='📖 Неопрацьовані дефекти', callback_data=str(con.ALL_DEFECTS))],
             [InlineKeyboardButton(text='📅 Неопрацьовані дефекти за датою', callback_data='test')],
-            [InlineKeyboardButton(text='⚙️ Дефекти в роботі', callback_data='test')],
+            [InlineKeyboardButton(text='⚙️ Дефекти в роботі', callback_data=str(con.DEFECTS_IN_WORK))],
             [InlineKeyboardButton(text='🔙 В головне меню', callback_data=str(con.END))]
         ]
         return InlineKeyboardMarkup(buttons)
@@ -55,3 +55,9 @@ class Buttons:
             [InlineKeyboardButton(text='🔒 Закрити', callback_data=con.Status.closed.value + str(id))]
         ]
         return InlineKeyboardMarkup(buttons)
+    
+    @staticmethod
+    def close(id):
+        return InlineKeyboardMarkup([
+            [InlineKeyboardButton(text='🔒 Закрити', callback_data=con.Status.closed.value + str(id))]
+        ])

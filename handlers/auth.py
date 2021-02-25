@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import CallbackContext
 import constants as con
 from buttons import Buttons
-from utils import Request
+from services.api_requests import Request
 
 
 def _get_user_role(context: CallbackContext):

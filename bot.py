@@ -3,7 +3,6 @@
 
 import logging
 import os
-import requests
 import constants as con
 from handlers.system import start, stop
 from handlers.auth import auth
@@ -19,17 +18,14 @@ from handlers.defect.new_defect import (
     add_defect,
     send_defect
 )
-from handlers.defect.active_defects import (
-    open_defects,
-    take_defect,
-    close_defect
-)
+from handlers.defect.actions import take_defect, close_defect
+from handlers.defect.active_defects import open_defects
+from handlers.defect.fixing_defects import defects_in_work
 
 from telegram.ext import (
     Updater,
     CommandHandler,
     ConversationHandler,
-    CallbackContext,
     CallbackQueryHandler,
     Filters,
     MessageHandler
@@ -83,22 +79,20 @@ def main() -> None:
         }
     )
 
+    defects_options = [
+        CallbackQueryHandler(open_defects, pattern='^' + str(con.ALL_DEFECTS) + '$'),
+        CallbackQueryHandler(defects_in_work, pattern='^' + str(con.DEFECTS_IN_WORK) + '$')
+    ]
+
     all_defects_conv = ConversationHandler(
-        entry_points=[
-            CallbackQueryHandler(open_defects, pattern='^' + str(con.ALL_DEFECTS) + '$')
-        ],
+        entry_points=defects_options,
         states={
-            con.DEFECTS_SELECTING_ACTIONS: [
-                
-            ],
             con.CHANGE_DEFECT_STATUS: [
                 CallbackQueryHandler(take_defect, pattern='^' + str(con.Status.in_process.value) + '[0-9]+$'),
                 CallbackQueryHandler(close_defect, pattern='^' + str(con.Status.closed.value) + '[0-9]+$')
             ]
         },
-        fallbacks=[
-            CallbackQueryHandler(open_defects, pattern='^' + str(con.ALL_DEFECTS) + '$')
-        ],
+        fallbacks=defects_options,
     )
     
 
