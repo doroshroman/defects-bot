@@ -18,7 +18,7 @@ class Request:
 
     @staticmethod
     def register(data):
-        url = _base_url + 'users/'
+        url = _base_url + 'users'
         return requests.post(url, data=data)
     
     @staticmethod
@@ -45,3 +45,8 @@ class Request:
     def get_defect_photo(photo_url, token):
         url = _base_url + f'defects/image/{photo_url}'
         return requests.get(url, auth=BearerAuth(token))
+
+    @staticmethod
+    def update_defect_status(defect_id, data, token):
+        url = _base_url + f'defects/{defect_id}/info'
+        return requests.put(url, data=data, auth=BearerAuth(token))

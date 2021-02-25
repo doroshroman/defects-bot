@@ -21,7 +21,8 @@ from handlers.defect.new_defect import (
 )
 from handlers.defect.active_defects import (
     open_defects,
-    take_defect
+    take_defect,
+    close_defect
 )
 
 from telegram.ext import (
@@ -81,19 +82,23 @@ def main() -> None:
             con.CANCEL_DEFECT: con.DESCRIBING_DEFECT
         }
     )
+
     all_defects_conv = ConversationHandler(
         entry_points=[
             CallbackQueryHandler(open_defects, pattern='^' + str(con.ALL_DEFECTS) + '$')
         ],
         states={
+            con.DEFECTS_SELECTING_ACTIONS: [
+                
+            ],
             con.CHANGE_DEFECT_STATUS: [
-                CallbackQueryHandler(take_defect, pattern='^' + str(con.Status.in_process.value) + '[0-9]+$' )
+                CallbackQueryHandler(take_defect, pattern='^' + str(con.Status.in_process.value) + '[0-9]+$'),
+                CallbackQueryHandler(close_defect, pattern='^' + str(con.Status.closed.value) + '[0-9]+$')
             ]
         },
-        fallbacks=[],
-        map_to_parent={
-            con.END: con.SELECTING_ACTION
-        }
+        fallbacks=[
+            CallbackQueryHandler(open_defects, pattern='^' + str(con.ALL_DEFECTS) + '$')
+        ],
     )
     
 

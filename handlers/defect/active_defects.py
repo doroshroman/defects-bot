@@ -14,7 +14,7 @@ def open_defects(update: Update, context: CallbackContext) -> int:
     status = con.Status.open.name
     token = user_data.get(con.ACCESS_TOKEN)
     response = Request.get_defects_by_status(status, token)
-    print("HERE"*10)
+
     if response.ok:
         defects = response.json()
 
@@ -49,11 +49,35 @@ def open_defects(update: Update, context: CallbackContext) -> int:
 
     return con.CHANGE_DEFECT_STATUS
 
+def _update_status(update: Update, context: CallbackContext, status: con.Status):
+    query = update.callback_query
+    data = query.data
+    defect_id = int(data.replace(status.value, ''))
 
-def take_defect(update: Update, context: CallbackContext) -> int:
-    data = update.callback_query.data
+    user_data = context.user_data
+    token = user_data.get(con.ACCESS_TOKEN)
+    payload = {
+        "worker": user_data.get(con.SENDER_ID),
+        "status": status.name
+    }
 
-    defect_id = int(data.replace(con.Status.in_process.value, ''))
-    print(defect_id)
+    response = Request.update_defect_status(defect_id, payload, token)
+    success_text = ('👆 Дефект успішно добавлений в роботу' if status == con.Status.in_process
+                        else '👆 Дефект успішно закритий')
+    reply_text = success_text if response.ok else "Сталася помилка не сервері"
+    
+    query.answer()
+    query.edit_message_text(text=reply_text)
+
+    return con.DEFECTS_SELECTING_ACTIONS
+
+def take_defect(update: Update, context: CallbackContext) -> None:
+    """Update defect status to in_process"""
+    _update_status(update, context, con.Status.in_process)
+
+def close_defect(update: Update, context: CallbackContext) -> None:
+    """Update defect status to closed"""
+    _update_status(update, context, con.Status.closed)
+
 
 
