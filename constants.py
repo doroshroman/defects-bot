@@ -13,11 +13,12 @@ from enum import Enum
     DESCRIBING_DEFECT,
     CANCEL_DEFECT,
     ALL_DEFECTS,
+    ALL_DEFECTS_BY_DATE,
     DEFECTS_IN_WORK,
     TAKE_DEFECT,
     CLOSE_DEFECT,
     CHANGE_DEFECT_STATUS,
-) = range(13)
+) = range(14)
 
 # user context constants
 (
@@ -35,7 +36,15 @@ from enum import Enum
     DEFECT_PHOTO,
     DEFECT_DONE,
     DEFECT_SEND
-) = range(13, 27)
+) = range(14, 28)
+
+(
+    DATE,
+    START_DATE,
+    END_DATE,
+    FIND_BY_DATE,
+    SEND_DATE
+) = range(28, 33)
 
 END = ConversationHandler.END
 

@@ -19,7 +19,13 @@ from handlers.defect.new_defect import (
     send_defect
 )
 from handlers.defect.actions import take_defect, close_defect
-from handlers.defect.active_defects import open_defects
+from handlers.defect.active_defects import (
+    open_defects,
+    open_defects_start_date,
+    open_defects_end_date,
+    open_defects_send_date,
+    open_defects_by_date
+) 
 from handlers.defect.fixing_defects import defects_in_work
 
 from telegram.ext import (
@@ -81,7 +87,9 @@ def main() -> None:
 
     defects_options = [
         CallbackQueryHandler(open_defects, pattern='^' + str(con.ALL_DEFECTS) + '$'),
-        CallbackQueryHandler(defects_in_work, pattern='^' + str(con.DEFECTS_IN_WORK) + '$')
+        CallbackQueryHandler(defects_in_work, pattern='^' + str(con.DEFECTS_IN_WORK) + '$'),
+        CallbackQueryHandler(open_defects_start_date, pattern='^' + str(con.ALL_DEFECTS_BY_DATE) + '$'),
+        CallbackQueryHandler(cancel_defect, pattern='^' + str(con.CANCEL_DEFECT) + '$')
     ]
 
     all_defects_conv = ConversationHandler(
@@ -90,12 +98,19 @@ def main() -> None:
             con.CHANGE_DEFECT_STATUS: [
                 CallbackQueryHandler(take_defect, pattern='^' + str(con.Status.in_process.value) + '[0-9]+$'),
                 CallbackQueryHandler(close_defect, pattern='^' + str(con.Status.closed.value) + '[0-9]+$')
+            ],
+            con.END_DATE: [
+                MessageHandler(Filters.text & ~Filters.command, open_defects_end_date)
+            ],
+            con.FIND_BY_DATE: [
+                MessageHandler(Filters.text & ~Filters.command, open_defects_send_date)
+            ],
+            con.SEND_DATE: [
+                CallbackQueryHandler(open_defects_by_date, pattern='^' + str(con.SEND_DATE))
             ]
         },
-        fallbacks=defects_options,
+        fallbacks=defects_options
     )
-    
-
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={

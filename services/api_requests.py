@@ -40,7 +40,12 @@ class Request:
     def get_defects_by_status(status, token):
         url = _base_url + f'defects/{status}'
         return requests.get(url, auth=BearerAuth(token))
-        
+    
+    @staticmethod
+    def get_defects_by_status_and_date(data, token):
+        url = _base_url + f'defects/date'
+        return requests.get(url, data=data, auth=BearerAuth(token))
+
     @staticmethod
     def get_defect_photo(photo_url, token):
         url = _base_url + f'defects/image/{photo_url}'
@@ -50,3 +55,5 @@ class Request:
     def update_defect_status(defect_id, data, token):
         url = _base_url + f'defects/{defect_id}/info'
         return requests.put(url, data=data, auth=BearerAuth(token))
+    
+    

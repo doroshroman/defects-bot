@@ -3,19 +3,44 @@ from .api_requests import Request
 import constants as con
 from buttons import Buttons
 import io, base64
+from datetime import datetime as dt
+from email.utils import format_datetime
 
 
-class Renderer:
-    def __init__(self, query, status, token):
-        self.query = query
+class DefectModel:
+    def __init__(self, status, token):
         self.status = status
         self.token = token
-        self.defects = self._get_defects()
-            
-    def _get_defects(self):
+    
+    def get_defects(self):
         response = Request.get_defects_by_status(self.status.name, self.token)
         return response.json() if response.ok else []
+    
+    def get_defects_by_date_range(self, start_date, end_date):
+        try:
+            start_day, start_month, start_year = [int(sd) for sd in start_date.split('.')]
+            end_day, end_month, end_year = [int(sd) for sd in end_date.split('.')]
+            start_date_dt = dt(start_year, start_month, start_day)
+            end_date_dt = dt(end_year, end_month, end_day)
 
+            payload={
+                "status": self.status.name,
+                "open_date": format_datetime(start_date_dt),
+                "close_date": format_datetime(end_date_dt)
+            }
+            response = Request.get_defects_by_status_and_date(payload, self.token)
+            return response.json() if response.ok else []
+        
+        except ValueError:
+            return []
+        
+
+class Renderer:
+    def __init__(self, query, status, defects):
+        self.query = query
+        self.status = status
+        self.defects = defects
+            
     def render(self):
         success_text = ("Список дефектів в роботі" if self.status == con.Status.in_process
                         else "Список відкритих дефектів")
@@ -49,7 +74,6 @@ class Renderer:
             self.query.from_user.send_message(text='Виберіть опцію', reply_markup=keyboard)
 
         self.query.from_user.send_message(text='Вернутися', reply_markup=Buttons.back_to_menu())
-
             
 
 

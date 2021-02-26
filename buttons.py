@@ -30,7 +30,7 @@ class Buttons:
         buttons = [
             [InlineKeyboardButton(text='➕ Додати дефект', callback_data=str(con.ADD_DEFECT))],
             [InlineKeyboardButton(text='📖 Неопрацьовані дефекти', callback_data=str(con.ALL_DEFECTS))],
-            [InlineKeyboardButton(text='📅 Неопрацьовані дефекти за датою', callback_data='test')],
+            [InlineKeyboardButton(text='📅 Неопрацьовані дефекти за датою', callback_data=str(con.ALL_DEFECTS_BY_DATE))],
             [InlineKeyboardButton(text='⚙️ Дефекти в роботі', callback_data=str(con.DEFECTS_IN_WORK))],
             [InlineKeyboardButton(text='🔙 В головне меню', callback_data=str(con.END))]
         ]
@@ -61,3 +61,11 @@ class Buttons:
         return InlineKeyboardMarkup([
             [InlineKeyboardButton(text='🔒 Закрити', callback_data=con.Status.closed.value + str(id))]
         ])
+    
+    @staticmethod
+    def done_or_cancel():
+        buttons = [
+            [InlineKeyboardButton(text='❌ Скасувати', callback_data=str(con.CANCEL_DEFECT))],
+            [InlineKeyboardButton(text='✅ Готово', callback_data=str(con.SEND_DATE))]
+        ]
+        return InlineKeyboardMarkup(buttons)

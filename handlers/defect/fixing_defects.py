@@ -1,7 +1,8 @@
 from telegram import Update
 from telegram.ext import CallbackContext
 import constants as con
-from services.defect_renderer import Renderer
+from services.defect import Renderer
+from services.defect import DefectModel
 
 
 def defects_in_work(update: Update, context: CallbackContext) -> int:
@@ -10,8 +11,11 @@ def defects_in_work(update: Update, context: CallbackContext) -> int:
 
     status = con.Status.in_process
     token = user_data.get(con.ACCESS_TOKEN)
-    
-    renderer = Renderer(query, status, token)
+
+    defect_model = DefectModel(status, token)
+    defects = defect_model.get_defects()
+
+    renderer = Renderer(query, status, defects)
     renderer.render()
 
     return con.CHANGE_DEFECT_STATUS
