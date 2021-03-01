@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import CallbackContext
 import constants as con
 from buttons import Buttons
-from utils import Request
+from services.api_requests import Request
 
 
 def _get_user_role(context: CallbackContext):
@@ -36,7 +36,10 @@ def auth(update: Update, context: CallbackContext) -> int:
         if role == con.Role.not_specified.value:
             reply_text = 'Ваша роль поки що не визначена. Звернітся до адміністратора.'
         elif role == con.Role.sanitary_worker.value:
-            keyboard = Buttons.add_defect()
+            keyboard = Buttons.get_cleaner_options()
+            state = con.DESCRIBING_DEFECT
+        elif role == con.Role.technical_worker.value:
+            keyboard = Buttons.get_all_options()
             state = con.DESCRIBING_DEFECT
             
     query.answer()
