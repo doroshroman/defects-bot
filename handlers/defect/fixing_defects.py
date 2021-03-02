@@ -15,7 +15,7 @@ def defects_in_work(update: Update, context: CallbackContext) -> int:
     defect_model = DefectModel(status, token)
     defects = defect_model.get_defects()
 
-    renderer = Renderer(query, status, defects)
-    renderer.render()
+    renderer = Renderer(query, status, defect_model)
+    renderer.render(defects)
 
     return con.CHANGE_DEFECT_STATUS

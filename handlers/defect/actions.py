@@ -15,7 +15,6 @@ def _update_status(update: Update, context: CallbackContext, status: con.Status)
         "worker": user_data.get(con.SENDER_ID),
         "status": status.name
     }
-
     response = Request.update_defect_status(defect_id, payload, token)
     success_text = ('👆 Дефект успішно добавлений в роботу' if status == con.Status.in_process
                         else '👆 Дефект успішно закритий')

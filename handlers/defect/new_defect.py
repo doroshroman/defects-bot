@@ -85,7 +85,7 @@ def add_defect(update: Update, context: CallbackContext) -> int:
     context.user_data[con.DEFECT].update({con.DEFECT_PHOTO: custom_path})
 
     text = "Надіслати"
-    keyboard = Buttons.done()
+    keyboard = Buttons.done_or_cancel()
     update.message.reply_text(text=text, reply_markup=keyboard)
     
     return con.DEFECT_SEND
