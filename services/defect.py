@@ -34,22 +34,26 @@ class DefectModel:
         except ValueError:
             return []
         
+    def get_defect_photo(self, photo_url):
+        response = Request.get_defect_photo(photo_url, self.token)
+        return response.json() if response.ok else None
+        
 
 class Renderer:
-    def __init__(self, query, status, defects):
+    def __init__(self, query, status, defect_model):
         self.query = query
         self.status = status
-        self.defects = defects
-            
-    def render(self):
+        self.defect_model = defect_model
+
+    def render(self, defects):
         success_text = ("Список дефектів в роботі" if self.status == con.Status.in_process
                         else "Список відкритих дефектів")
-        header_text = success_text if self.defects else 'Поки що немає дефектів'
+        header_text = success_text if defects else 'Поки що немає дефектів'
 
         self.query.answer()
         self.query.edit_message_text(header_text)
 
-        for defect in self.defects:
+        for defect in defects:
             def_text = f"Назва: <b>{defect['title']}</b>\n"
             def_text += (f"Опис: <i>{defect['description']}</i>\n"
                             if 'description' in defect else '') 
@@ -59,8 +63,8 @@ class Renderer:
             # Get defect image
             photo_url = defect.get('attachment')
             if photo_url:
-                response = Request.get_defect_photo(photo_url, self.token).json()
-                encoded = response['image_encode'][2:-1]
+                image = self.defect_model.get_defect_photo(photo_url)
+                encoded = image['image_encode'][2:-1]
                 decoded = base64.b64decode(encoded)
                 photo_file = io.BufferedReader(io.BytesIO(decoded))
                 self.query.from_user.send_photo(photo_file)

@@ -16,8 +16,8 @@ def open_defects(update: Update, context: CallbackContext) -> int:
     defect_model = DefectModel(status, token)
     defects = defect_model.get_defects()
 
-    renderer = Renderer(query, status, defects)
-    renderer.render()
+    renderer = Renderer(query, status, defect_model)
+    renderer.render(defects)
 
     return con.CHANGE_DEFECT_STATUS
 
@@ -66,8 +66,8 @@ def open_defects_by_date(update: Update, context: CallbackContext) -> int:
     defects = defect_model.get_defects_by_date_range(start_date, end_date)
     
     query = update.callback_query
-    renderer = Renderer(query, status, defects)
-    renderer.render()
+    renderer = Renderer(query, status, defect_model)
+    renderer.render(defects)
 
     return con.CHANGE_DEFECT_STATUS
     

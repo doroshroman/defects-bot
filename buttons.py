@@ -35,14 +35,7 @@ class Buttons:
             [InlineKeyboardButton(text='🔙 В головне меню', callback_data=str(con.END))]
         ]
         return InlineKeyboardMarkup(buttons)
-
-    @staticmethod
-    def done():
-        buttons = [
-            [InlineKeyboardButton(text='✅ Готово', callback_data=str(con.DEFECT_SEND))]
-        ]
-        return InlineKeyboardMarkup(buttons)
-
+        
     @staticmethod
     def cancel():
         buttons = [[InlineKeyboardButton(text='❌ Скасувати', callback_data=str(con.CANCEL_DEFECT))]]
@@ -66,6 +59,6 @@ class Buttons:
     def done_or_cancel():
         buttons = [
             [InlineKeyboardButton(text='❌ Скасувати', callback_data=str(con.CANCEL_DEFECT))],
-            [InlineKeyboardButton(text='✅ Готово', callback_data=str(con.SEND_DATE))]
+            [InlineKeyboardButton(text='✅ Готово', callback_data=str(con.DEFECT_SEND))]
         ]
         return InlineKeyboardMarkup(buttons)
