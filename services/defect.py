@@ -45,6 +45,14 @@ class Renderer:
         self.status = status
         self.defect_model = defect_model
 
+    def _render_photo(self, photo_url):
+        image = self.defect_model.get_defect_photo(photo_url)
+        if image:
+            encoded = image['image_encode'][2:-1]
+            decoded = base64.b64decode(encoded)
+            photo_file = io.BufferedReader(io.BytesIO(decoded))
+            self.query.from_user.send_photo(photo_file)
+        
     def render(self, defects):
         success_text = ("Список дефектів в роботі" if self.status == con.Status.in_process
                         else "Список відкритих дефектів")
@@ -60,14 +68,9 @@ class Renderer:
             def_text += f"Кімната: {defect['room']}\n" if 'room' in defect else ''
             self.query.from_user.send_message(text=def_text, parse_mode=ParseMode.HTML)
 
-            # Get defect image
             photo_url = defect.get('attachment')
             if photo_url:
-                image = self.defect_model.get_defect_photo(photo_url)
-                encoded = image['image_encode'][2:-1]
-                decoded = base64.b64decode(encoded)
-                photo_file = io.BufferedReader(io.BytesIO(decoded))
-                self.query.from_user.send_photo(photo_file)
+                self._render_photo(photo_url)            
 
             def_id = defect["id"]
             keyboard = (Buttons.close(def_id) if self.status == con.Status.in_process 

@@ -22,7 +22,7 @@ def _remove_defect_cache(context: CallbackContext) -> None:
         os.remove(defect_photo)
 
     # delete empty folder
-    photo_folder = os.environ.get('FILE_CUSTOM_PATH')
+    photo_folder = os.environ.get('FILE_CUSTOM_PATH') or con.DEFAULT_PHOTO_FOLDER
     if os.path.isdir(photo_folder) and not len(os.listdir(photo_folder)):
         os.rmdir(photo_folder)
     
@@ -76,7 +76,7 @@ def defect_photo(update: Update, context: CallbackContext) -> int:
 def add_defect(update: Update, context: CallbackContext) -> int:
     photo_file = update.message.photo[-1].get_file()
 
-    photos_directory = os.environ.get('FILE_CUSTOM_PATH')
+    photos_directory = os.environ.get('FILE_CUSTOM_PATH') or con.DEFAULT_PHOTO_FOLDER
     if not os.path.exists(photos_directory):
         os.makedirs(photos_directory)
 

@@ -48,6 +48,7 @@ from enum import Enum
 
 END = ConversationHandler.END
 
+DEFAULT_PHOTO_FOLDER = './photos/'
 
 class Role(Enum):
     not_specified = "Не визначено"
