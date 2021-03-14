@@ -4,9 +4,10 @@
 ***
 ### How to run?
 
-1. Create **.env** file inside project root folder with environment variables like below:
+1. Create **.env** file inside project root folder with environment variables like below:  
     TELEGRAM_TOKEN=_your telegram token_  
-    BASE_URL=_base api endpoint url_*   
+    BASE_URL=_base api endpoint url_*  
+    
     *You can use url for deployed api: http://defects-management.herokuapp.com/ 
 
 2. Build the docker image:
